@@ -1,0 +1,14 @@
+{
+  "name": "expectation-parser",
+  "version": "0.0.0",
+  "description": "A set of simple functions that allow you to naively implement a non-predictive recursive descent parser.",
+  "main": "./index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "parser"
+  ],
+  "author": "Joseph Sikorski",
+  "license": "MIT"
+}
