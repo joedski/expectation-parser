@@ -74,9 +74,9 @@ which produces something like
 ```
 Production {
 	ruleName: 'expression', contents: [
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '1' } } ] },
-		Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '+' } } ] },
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '2' } } ] },
+		TerminalProduction { terminal: { type: 'number', value: '1' } },
+		TerminalProduction { terminal: { type: 'operator', value: '+' } },
+		TerminalProduction { terminal: { type: 'number', value: '2' } },
 	]
 }
 ```
@@ -99,9 +99,9 @@ console.log( expectExpression( tokens ) );
 ```
 Production {
 	ruleName: 'expression', contents: [
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '1' } } ] },
-		Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '+' } } ] },
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '2' } } ] },
+		TerminalProduction { terminal: { type: 'number', value: '1' } },
+		TerminalProduction { terminal: { type: 'operator', value: '+' } },
+		TerminalProduction { terminal: { type: 'number', value: '2' } },
 	]
 }
 ```
@@ -200,12 +200,12 @@ Gives us...
 ```
 Production {
 	ruleName: 'expression', contents: [
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '1' } } ] },
-		Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '+' } } ] },
+		TerminalProduction { terminal: { type: 'number', value: '1' } },
+		TerminalProduction { terminal: { type: 'operator', value: '+' } },
 		Production { ruleName: 'expression', contents [
-			Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '2' } } ] },
-			Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '-' } } ] },
-			Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '3' } } ] },
+			TerminalProduction { terminal: { type: 'number', value: '2' } },
+			TerminalProduction { terminal: { type: 'operator', value: '-' } },
+			TerminalProduction { terminal: { type: 'number', value: '3' } },
 		] },
 	]
 }
@@ -246,11 +246,11 @@ Then running those tokens through this shiny new expectation gives us...
 ```
 Production {
 	ruleName: 'expression', contents: [
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '1' } } ] },
-		Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '+' } } ] },
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '2' } } ] },
-		Production { ruleName: 'operator', contents [ TerminalProduction { terminal: { type: 'operator', value: '-' } } ] },
-		Production { ruleName: 'number', contents [ TerminalProduction { terminal: { type: 'number', value: '3' } } ] },
+		TerminalProduction { terminal: { type: 'number', value: '1' } },
+		TerminalProduction { terminal: { type: 'operator', value: '+' } },
+		TerminalProduction { terminal: { type: 'number', value: '2' } },
+		TerminalProduction { terminal: { type: 'operator', value: '-' } },
+		TerminalProduction { terminal: { type: 'number', value: '3' } },
 	]
 }
 ```
@@ -262,8 +262,51 @@ Basically what we put in.  ... Oh dear.  Guess we don't need a parser for that, 
 So it seems that just evaluating numbers from left to right with out regard for order of operations is pretty boring.  But, it's actually pretty easy to extend this to basic order of operations, like so...
 
 ```
-expression = product, ( add | subtract ), product, { ( add | subtract ), product };
+expression = product, { ( add | subtract ), product };
 product = number, { ( multiple | divide ) }, number };
 ```
 
 Rewriting the JS to match this will result in a structure that, when evaluated, will perform any multiplications and divisions from left to right first before doing additions and subtractions.  Thus, `1 - 2 * 3` is treated as `1 - (2 * 3)`.
+
+```js
+var expectNumber = expect.terminal({ type: 'number' });
+var expectAdd = expect.terminal({ type: 'operation', value: '+' });
+var expectSubtract = expect.terminal({ type: 'operation', value: '-' });
+var expectMultiply = expect.terminal({ type: 'operation', value: '*' });
+var expectDivide = expect.terminal({ type: 'operation', value: '/' });
+
+var expectAdditive = expect.alternation([ expectAdd, expectSubtract ]);
+var expectMultiplicative = expect.alternation([ expectMultiply, expectDivide ]);
+
+function expectSum( tokens ) {
+	var production = expect.sequence([
+		expectProduct,
+		expect.repetition( expect.sequence([
+			expectAdditive,
+			expectProduct
+		]))
+	], tokens );
+
+	if( production ) {
+		return new productions.Production( 'sum', production.contents );
+	}
+
+	return null;
+}
+
+function expectProduct( tokens ) {
+	var production = expect.sequence([
+		expectNumber,
+		expect.repetition( expect.sequence([
+			expectMultiplicative,
+			expectNumber
+		]))
+	], tokens );
+
+	if( production ) {
+		return new productions.Production( 'product', production.contents );
+	}
+
+	return null;
+}
+```

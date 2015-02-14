@@ -26,12 +26,12 @@ Stick in an array of tokens in the form of `{ type: 'tokenType', value: 'optiona
 
 > Note that the Special Sequence thingy in EBNF isn't directly supported because you can just use regexes anyway.  In fact, terminals are evaluated with regexes.
 
-Recall those steps at the top, that's basically how to use this.  If you find EBNF insufficient because for some reason you need to write in insidiously slow C++ parser in JS, you can probably use these functions to help in some way, but may just need to use something else because C++ is a funny beast.  C is, too, come to that, but at least it doesn't have templates.
+Recall those steps at the top, that's basically how to use this.  If you find EBNF insufficient because for some reason you need to write an insidiously slow C++ parser in JS, you can probably use these functions to help in some way, but may just need to use something else because C++ is a funny beast.  C is, too, come to that, but at least it doesn't have templates.
 
 ### API
 
 ```js
-var expect = require( 'simple-parser' );
+var expect = require( 'expectation-parser' );
 ```
 
 #### alternation

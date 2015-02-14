@@ -3,18 +3,6 @@ var productions = require( './productions' );
 // These functions can let you more or less translate EBNF into JS.
 // That means there's probably a minimal amount of code needed to reduce how much you actually have to write.
 
-// Usage:
-// expect.optional( expect.terminal({ type: 'lineEnd' }) )
-// This returns an expectation function which accepts tokens
-// and outputs an anonymous production containing either...
-// - a single terminal production
-// - nothing
-
-////////////////////////////////
-// Prelude: General Expectation Functions
-////////////////////////////////
-// Note: The expectation functions take an array of tokens and some form of functions, ussually an array of.
-
 // This only does what we need here, not general purpose currying.
 // I wish JS had currying.
 function currifyGeneralExpectation( generalExpectation ) {
