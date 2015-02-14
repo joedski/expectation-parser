@@ -5,6 +5,8 @@ Step 1: Write EBNF.
 
 Step 2: Write Javascript.
 
+Step 3: Hold EBNF in originai position, move Javascript up and down.
+
 Step 3: Now you can parse anything.*
 
 > *Hah hah now try XML.
@@ -13,7 +15,7 @@ A simple parser that's not so much a parser as a set of functions you can rig up
 
 These functions do not have any provisions for streaming input, although you could probably come up with one at one or two levels at the top.  (Or more!)
 
-Also, you can do XML, it just requires a couple more lines of code that don't involve these here functions to check tag names.
+Also, you can do XML, it just requires a couple more lines of code that don't involve these here functions to check tag names.  But there are other things that require a bit (a lot) more legwork to parse.
 
 
 
